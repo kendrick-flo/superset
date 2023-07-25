@@ -14,14 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-x-superset-image: &superset-image apache/superset:${TAG:-latest-dev}
+#x-superset-image: &superset-image apachesuperset.docker.scarf.sh/apache/superset:${TAG:-2.1.0}
+x-superset-image: &superset-image reco-superset:latest
 x-superset-depends-on: &superset-depends-on
-  - db
   - redis
 x-superset-volumes: &superset-volumes
   # /app/pythonpath_docker will be appended to the PYTHONPATH in the final container
   - ./docker:/app/docker
-  - superset_home:/app/superset_home
+  - /dashboard/superset_home:/app/superset_home
 
 version: "3.7"
 services:
@@ -30,17 +30,11 @@ services:
     container_name: superset_cache
     restart: unless-stopped
     volumes:
-      - redis:/data
-
-  db:
-    env_file: docker/.env-non-dev
-    image: postgres:14
-    container_name: superset_db
-    restart: unless-stopped
-    volumes:
-      - db_home:/var/lib/postgresql/data
+      - /dashbaord/redis/data:/data
 
   superset:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     env_file: docker/.env-non-dev
     image: *superset-image
     container_name: superset_app
@@ -48,11 +42,13 @@ services:
     user: "root"
     restart: unless-stopped
     ports:
-      - 8088:8088
+      - 80:8088
     depends_on: *superset-depends-on
     volumes: *superset-volumes
 
   superset-init:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     image: *superset-image
     container_name: superset_init
     command: ["/app/docker/docker-init.sh"]
@@ -64,6 +60,8 @@ services:
       disable: true
 
   superset-worker:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     image: *superset-image
     container_name: superset_worker
     command: ["/app/docker/docker-bootstrap.sh", "worker"]
@@ -73,9 +71,11 @@ services:
     user: "root"
     volumes: *superset-volumes
     healthcheck:
-      test: ["CMD-SHELL", "celery inspect ping -A superset.tasks.celery_app:app -d celery@$$HOSTNAME"]
+      disable: true
 
   superset-worker-beat:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     image: *superset-image
     container_name: superset_worker_beat
     command: ["/app/docker/docker-bootstrap.sh", "beat"]
@@ -86,11 +86,4 @@ services:
     volumes: *superset-volumes
     healthcheck:
       disable: true
-
-volumes:
-  superset_home:
-    external: false
-  db_home:
-    external: false
-  redis:
-    external: false
+  

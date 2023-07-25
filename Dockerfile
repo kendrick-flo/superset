@@ -78,6 +78,9 @@ RUN cd /app \
     && touch superset/static/version_info.json \
     && pip install --no-cache -r requirements/local.txt
 
+RUN pip install --upgrade pip
+RUN pip install lunarcalendar tqdm "pystan<3.0" && pip install "prophet>=1.0.1, <1.1"
+
 COPY --from=superset-node /app/superset/static/assets /app/superset/static/assets
 
 ## Lastly, let's install superset itself
