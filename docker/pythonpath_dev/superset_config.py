@@ -27,6 +27,10 @@ from typing import Optional
 
 from cachelib.file import FileSystemCache
 from celery.schedules import crontab
+from flask_appbuilder.security.manager import AUTH_DB
+from superset.security import SupersetSecurityManager
+from flask_login import LoginManager
+
 
 logger = logging.getLogger()
 
@@ -105,6 +109,7 @@ EXPLORE_FORM_DATA_CACHE_CONFIG = {
     "CACHE_REDIS_DB": REDIS_EXPLORE_FORM_DATA_CACHE_DB,
 }
 
+
 class CeleryConfig(object):
     broker_url = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_CELERY_DB}"
     imports = ("superset.sql_lab",)
@@ -126,24 +131,48 @@ class CeleryConfig(object):
 CELERY_CONFIG = CeleryConfig
 
 FEATURE_FLAGS = {
-        "ALERT_REPORTS": True,
-        'CLIENT_CACHE': True,
-        'ENABLE_EXPLORE_JSON_CSRF_PROTECTION': False,
-        'PRESTO_EXPAND_DATA': True,
-        }
+    "ALERT_REPORTS": True,
+    'CLIENT_CACHE': True,
+    'ENABLE_EXPLORE_JSON_CSRF_PROTECTION': False,
+    'PRESTO_EXPAND_DATA': True,
+}
 ALERT_REPORTS_NOTIFICATION_DRY_RUN = True
 WEBDRIVER_BASEURL = "http://superset:8088/"
 # The base URL for the email report hyperlinks.
 WEBDRIVER_BASEURL_USER_FRIENDLY = WEBDRIVER_BASEURL
 
+# SQL LAB
 SQLLAB_CTAS_NO_LIMIT = True
+SQLLAB_TIMEOUT = int(timedelta(seconds=60).total_seconds())
 
 # Logging
 ENABLE_TIME_ROTATE = True
 
 SECRET_KEY = 'gIDkKronnUMX1GzPOkIPbWNMpkmIXpAJdIKLbdfPKhFUaXDBNetyVhEh'
 
-SQLLAB_TIMEOUT = int(timedelta(seconds=60).total_seconds())
+# Set the authentication type to OAuth
+AUTH_TYPE = AUTH_DB
+# Will allow user self registration, allowing to create Flask users from Authorized User
+AUTH_USER_REGISTRATION = True
+# The default user self registration role
+# Can change it to Gamma if want user to have dashboard view
+AUTH_USER_REGISTRATION_ROLE = "Gamma"
+SAML_PATH = "/app/superset_home/saml"
+LOGOUT_REDIRECT_URL = "https://flo-reco-dashboard.dev.music-flo.io/saml/acs"
+
+
+class RecoSupersetSecurityManager(SupersetSecurityManager):
+    def __init__(self, appbuilder):
+        super(RecoSupersetSecurityManager, self).__init__(appbuilder)
+
+    def create_login_manager(self, app) -> LoginManager:
+        lm = super().create_login_manager(app)
+        lm.login_view = "saml/acs"
+        lm.refresh_view = "saml/acs"
+        return lm
+
+
+CUSTOM_SECURITY_MANAGER = RecoSupersetSecurityManager
 
 #
 # Optionally import superset_config_docker.py (which will have been included on

@@ -65,6 +65,7 @@ RUN mkdir -p ${PYTHONPATH} \
             libsasl2-modules-gssapi-mit \
             libpq-dev \
             libecpg-dev \
+            libxmlsec1-dev \
         && rm -rf /var/lib/apt/lists/*
 
 COPY ./requirements/*.txt  /app/requirements/
