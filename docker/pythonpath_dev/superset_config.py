@@ -172,6 +172,7 @@ WTF_CSRF_EXEMPT_LIST = [
     "superset.views.saml.single_logout_service",
     "superset.views.saml.metadata"
 ]
+ENABLE_PROXY_FIX = True
 
 class RecoSupersetSecurityManager(SupersetSecurityManager):
     def __init__(self, appbuilder):

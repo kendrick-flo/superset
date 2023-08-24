@@ -39,6 +39,7 @@ def init_saml_auth(req):
 
 def prepare_flask_request(request):
     # If server is behind proxys or balancers use the HTTP_X_FORWARDED fields
+    request.scheme = "https"
     return {
         "https": "on" if request.scheme == "https" else "off",
         "http_host": request.host,
