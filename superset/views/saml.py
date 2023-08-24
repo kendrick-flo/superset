@@ -101,7 +101,6 @@ class SAMLView(BaseSupersetView):
                 session["samlNameIdNameQualifier"] = auth.get_nameid_nq()
                 session["samlNameIdSPNameQualifier"] = auth.get_nameid_spnq()
                 session["samlSessionIndex"] = auth.get_session_index()
-                self_url = OneLogin_Saml2_Utils.get_self_url(req)
 
                 user = self.appbuilder.sm.find_user(email=session["samlNameId"])
                 if not user:
@@ -115,14 +114,10 @@ class SAMLView(BaseSupersetView):
                         role=self.appbuilder.sm.find_role("Gamma"),
                     )
                 login_user(user, remember=True)
-                if (
-                    "RelayState" in request.form
-                    and self_url != request.form["RelayState"]
-                ):
-                    # To avoid 'Open Redirect' attacks, before execute the
-                    # redirection confirm the value of the request.form['RelayState']
-                    # is a trusted URL.
-                    return redirect(auth.redirect_to(request.form["RelayState"]))
+                # FIXME: request.form["RelayState"] <- 공백 값이 옴
+                #  return_to 로 redirection url 을 강제 주입한다
+                return_to = f"{request.host_url}superset/welcome/"
+                return redirect(auth.redirect_to(return_to))
             elif auth.get_settings().is_debug_active():
                 error_reason = auth.get_last_error_reason()
 
