@@ -160,6 +160,18 @@ AUTH_USER_REGISTRATION_ROLE = "Gamma"
 SAML_PATH = "/app/superset_home/saml"
 LOGOUT_REDIRECT_URL = "https://flo-reco-dashboard.dev.music-flo.io/saml/acs"
 
+# Add endpoints that need to be exempt from CSRF protection
+WTF_CSRF_EXEMPT_LIST = [
+    "superset.views.core.log",
+    "superset.views.core.explore_json",
+    "superset.charts.data.api.data",
+
+    "superset.views.saml.assertion_consumer_service",
+    "superset.views.saml.single_sign_on",
+    "superset.views.saml.single_logout",
+    "superset.views.saml.single_logout_service",
+    "superset.views.saml.metadata"
+]
 
 class RecoSupersetSecurityManager(SupersetSecurityManager):
     def __init__(self, appbuilder):

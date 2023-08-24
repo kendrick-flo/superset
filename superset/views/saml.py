@@ -82,7 +82,8 @@ class SAMLView(BaseSupersetView):
 
         request_id = None
 
-        if request.method == "GET" and g.user is not None and g.user.is_authenticated:
+        if (request.method == "GET" and g.user is not None and g.user.is_authenticated
+            and "samlUserdata" in session):
             return redirect(self.appbuilder.get_url_for_index)
         elif request.method == "POST":
             if "AuthNRequestID" in session:
