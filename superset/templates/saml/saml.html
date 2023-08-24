@@ -19,50 +19,58 @@
 {% extends "saml/saml_base.html" %}
 
 {% block content %}
-
-{% if errors %}
-  <div class="alert alert-danger" role="alert">
-    <strong>Errors:</strong>
-    <ul class="list-unstyled">
+  {% if errors %}
+    <div class="alert alert-danger" role="alert">
+      <strong>Errors:</strong>
+      <ul class="list-unstyled">
         {% for err in errors %}
-          <li>{{err}}</li>
+          <li>{{ err }}</li>
         {% endfor %}
-    </ul>
-    {% if error_reason %}
-        <span>{{error_reason}}</span>
-    {% endif %}
-  </div>
-{% endif %}
-
-{% if not_auth_warn %}
-  <div class="alert alert-danger" role="alert">Not authenticated</div>
-{% endif %}
-
-{% if success_slo %}
-  <div class="alert alert-success" role="alert">Successfully logged out</div>
-{% endif %}
-
-{% if paint_logout %}
-  {% if attributes %}
-    <table class="table table-striped">
-      <thead>
-        <th>Name</th><th>Values</th>
-      </thead>
-      <tbody>
-        {% for attr in attributes %}
-          <tr><td>{{ attr.0 }}</td>
-          <td><ul class="list-unstyled">
-            {% for val in attr.1 %}
-              <li>{{ val }}</li>
-            {% endfor %}
-          </ul></td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+      </ul>
+      {% if error_reason %}
+        <span>{{ error_reason }}</span>
+      {% endif %}
+    </div>
   {% endif %}
-  <a href="{{ url_for('SAMLView.single_logout') }}" class="btn btn-danger">Logout</a>
-{% else %}
-  <a href="{{ url_for('SAMLView.single_sign_on') }}" class="btn btn-primary">Login</a>
-{% endif %}
 
+  {% if not_auth_warn %}
+    <div style="padding:1em; display:inline-block; text-align: center; width: 50%;" class="alert alert-danger" role="alert">Not authenticated</div>
+  {% endif %}
+
+  {% if success_slo %}
+    <div style="padding:1em; display:inline-block; text-align: center; width: 50%;" class="alert alert-success" role="alert">Successfully logged out</div>
+  {% endif %}
+
+  {% if paint_logout %}
+    {% if attributes %}
+      <table style="padding:1em; display:inline-block; text-align: center; width: 50%;" class="table table-striped">
+        <thead>
+        <th>Name</th>
+        <th>Values</th>
+        </thead>
+        <tbody>
+        {% for attr in attributes %}
+          <tr>
+            <td>{{ attr.0 }}</td>
+            <td>
+              <ul class="list-unstyled">
+                {% for val in attr.1 %}
+                  <li>{{ val }}</li>
+                {% endfor %}
+              </ul>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+    <a style="padding:1em; display:inline-block; text-align: center; width: 50%;"
+       href="{{ url_for('SAMLView.single_logout') }}" class="btn btn-danger">Logout</a>
+  {% else %}
+    <a style="padding:1em; display:inline-block; text-align: center; width: 50%;"
+       href="{{ url_for('SAMLView.single_sign_on') }}" class="btn btn-primary">Login</a>
+  {% endif %}
+  {% block footer %}
+    <footer style="position: absolute; bottom: 10%; width: 80%; height: 2.5rem;">Contact: jssung@dreamus.io (Kendrick) | g-dev-reco@dreamus.io (추천 기술 Unit)</footer>
+  {% endblock %}
 {% endblock %}

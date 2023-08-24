@@ -180,8 +180,8 @@ class RecoSupersetSecurityManager(SupersetSecurityManager):
 
     def create_login_manager(self, app) -> LoginManager:
         lm = super().create_login_manager(app)
-        lm.login_view = "saml/acs"
-        lm.refresh_view = "saml/acs"
+        lm.login_view = "https://flo-reco-dashboard.dev.music-flo.io/saml/acs"
+        lm.refresh_view = "https://flo-reco-dashboard.dev.music-flo.io/saml/acs"
         return lm
 
 
