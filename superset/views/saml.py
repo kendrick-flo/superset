@@ -18,7 +18,7 @@
 import uuid
 from typing import Union
 
-from flask import request, render_template, session, make_response, redirect, g
+from flask import request, session, make_response, redirect, g
 from flask_appbuilder import expose
 from flask_appbuilder.api import safe
 from flask_login import login_user
@@ -124,7 +124,7 @@ class SAMLView(BaseSupersetView):
             elif auth.get_settings().is_debug_active():
                 error_reason = auth.get_last_error_reason()
 
-        return render_template(
+        return self.render_template(
             "saml/index.html",
             errors=errors,
             error_reason=error_reason,
@@ -216,7 +216,7 @@ class SAMLView(BaseSupersetView):
         elif auth.get_settings().is_debug_active():
             error_reason = auth.get_last_error_reason()
 
-        return render_template(
+        return self.render_template(
             "saml/index.html",
             errors=errors,
             error_reason=error_reason,
