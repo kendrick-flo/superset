@@ -18,9 +18,7 @@
 import uuid
 from typing import Union
 
-from flask import (
-    request, render_template, session,
-    make_response, redirect, g)
+from flask import request, render_template, session, make_response, redirect, g
 from flask_appbuilder import expose
 from flask_appbuilder.api import safe
 from flask_login import login_user
@@ -34,20 +32,20 @@ from superset.views.base_api import BaseSupersetApi, statsd_metrics
 
 
 def init_saml_auth(req):
-    auth = OneLogin_Saml2_Auth(req, custom_base_path=conf['SAML_PATH'])
+    auth = OneLogin_Saml2_Auth(req, custom_base_path=conf["SAML_PATH"])
     return auth
 
 
 def prepare_flask_request(request):
     # If server is behind proxys or balancers use the HTTP_X_FORWARDED fields
     return {
-        'https': 'on' if request.scheme == 'https' else 'off',
-        'http_host': request.host,
-        'script_name': request.path,
-        'get_data': request.args.copy(),
+        "https": "on" if request.scheme == "https" else "off",
+        "http_host": request.host,
+        "script_name": request.path,
+        "get_data": request.args.copy(),
         # Uncomment if using ADFS as IdP, https://github.com/onelogin/python-saml/pull/144
         # 'lowercase_urlencoding': True,
-        'post_data': request.form.copy()
+        "post_data": request.form.copy(),
     }
 
 
@@ -56,11 +54,12 @@ class SAMLRestApi(BaseSupersetApi):
     Superset (SP) - Gsuite (IDP) SAML2.0 연동을 위한 Custom API
     Reference: https://github.com/SAML-Toolkits/python3-saml > demo-flask 예제 참고
     """
+
     route_base = "/saml"
-    allow_browser_login = False
+    allow_browser_login = True
     openapi_spec_tag = "SAML"
 
-    @expose("/acs", methods=["GET, POST"])
+    @expose("/acs", methods=["GET", "POST"])
     @event_logger.log_this
     @safe
     @statsd_metrics
@@ -85,54 +84,57 @@ class SAMLRestApi(BaseSupersetApi):
         if request.method == "GET" and g.user is not None and g.user.is_authenticated:
             return redirect(self.appbuilder.get_url_for_index)
         elif request.method == "POST":
-            if 'AuthNRequestID' in session:
-                request_id = session['AuthNRequestID']
+            if "AuthNRequestID" in session:
+                request_id = session["AuthNRequestID"]
 
             auth.process_response(request_id=request_id)
             errors = auth.get_errors()
             not_auth_warn = not auth.is_authenticated()
             if len(errors) == 0:
-                if 'AuthNRequestID' in session:
-                    del session['AuthNRequestID']
-                session['samlUserdata'] = auth.get_attributes()
-                session['samlNameId'] = auth.get_nameid()
-                session['samlNameIdFormat'] = auth.get_nameid_format()
-                session['samlNameIdNameQualifier'] = auth.get_nameid_nq()
-                session['samlNameIdSPNameQualifier'] = auth.get_nameid_spnq()
-                session['samlSessionIndex'] = auth.get_session_index()
+                if "AuthNRequestID" in session:
+                    del session["AuthNRequestID"]
+                session["samlUserdata"] = auth.get_attributes()
+                session["samlNameId"] = auth.get_nameid()
+                session["samlNameIdFormat"] = auth.get_nameid_format()
+                session["samlNameIdNameQualifier"] = auth.get_nameid_nq()
+                session["samlNameIdSPNameQualifier"] = auth.get_nameid_spnq()
+                session["samlSessionIndex"] = auth.get_session_index()
                 self_url = OneLogin_Saml2_Utils.get_self_url(req)
 
-                user = self.appbuilder.sm.find_user(email=session['samlNameId'])
+                user = self.appbuilder.sm.find_user(email=session["samlNameId"])
                 if not user:
                     password = str(uuid.uuid4())
                     user = self.appbuilder.sm.add_user(
-                        username=session['samlNameId'],
-                        first_name=session['samlNameId'],
-                        last_name=session['samlNameId'],
-                        email=session['samlNameId'],
+                        username=session["samlNameId"],
+                        first_name=session["samlNameId"],
+                        last_name=session["samlNameId"],
+                        email=session["samlNameId"],
                         password=password,
-                        role=self.appbuilder.sm.find_role("Gamma"))
+                        role=self.appbuilder.sm.find_role("Gamma"),
+                    )
                 login_user(user, remember=True)
-                if 'RelayState' in request.form and self_url != request.form[
-                    'RelayState']:
+                if (
+                    "RelayState" in request.form
+                    and self_url != request.form["RelayState"]
+                ):
                     # To avoid 'Open Redirect' attacks, before execute the
                     # redirection confirm the value of the request.form['RelayState']
                     # is a trusted URL.
-                    return redirect(auth.redirect_to(request.form['RelayState']))
+                    return redirect(auth.redirect_to(request.form["RelayState"]))
             elif auth.get_settings().is_debug_active():
                 error_reason = auth.get_last_error_reason()
 
         return render_template(
-            'saml/index.html',
+            "saml/index.html",
             errors=errors,
             error_reason=error_reason,
             not_auth_warn=not_auth_warn,
             success_slo=success_slo,
             attributes=attributes,
-            paint_logout=paint_logout
+            paint_logout=paint_logout,
         )
 
-    @expose("/sso", methods=["GET, POST"])
+    @expose("/sso", methods=["GET", "POST"])
     @event_logger.log_this
     @safe
     @statsd_metrics
@@ -145,7 +147,7 @@ class SAMLRestApi(BaseSupersetApi):
         return_to = f"{request.host_url}superset/welcome/"
         return redirect(auth.login(return_to))
 
-    @expose("/slo", methods=["GET, POST"])
+    @expose("/slo", methods=["GET", "POST"])
     @event_logger.log_this
     @safe
     @statsd_metrics
@@ -158,23 +160,29 @@ class SAMLRestApi(BaseSupersetApi):
         return_to = f"{request.host_url}saml/acs"
 
         name_id = session_index = name_id_format = name_id_nq = name_id_spnq = None
-        if 'samlNameId' in session:
-            name_id = session['samlNameId']
-        if 'samlSessionIndex' in session:
-            session_index = session['samlSessionIndex']
-        if 'samlNameIdFormat' in session:
-            name_id_format = session['samlNameIdFormat']
-        if 'samlNameIdNameQualifier' in session:
-            name_id_nq = session['samlNameIdNameQualifier']
-        if 'samlNameIdSPNameQualifier' in session:
-            name_id_spnq = session['samlNameIdSPNameQualifier']
+        if "samlNameId" in session:
+            name_id = session["samlNameId"]
+        if "samlSessionIndex" in session:
+            session_index = session["samlSessionIndex"]
+        if "samlNameIdFormat" in session:
+            name_id_format = session["samlNameIdFormat"]
+        if "samlNameIdNameQualifier" in session:
+            name_id_nq = session["samlNameIdNameQualifier"]
+        if "samlNameIdSPNameQualifier" in session:
+            name_id_spnq = session["samlNameIdSPNameQualifier"]
 
         return redirect(
-            auth.logout(name_id=name_id, session_index=session_index, nq=name_id_nq,
-                        name_id_format=name_id_format, spnq=name_id_spnq,
-                        return_to=return_to))
+            auth.logout(
+                name_id=name_id,
+                session_index=session_index,
+                nq=name_id_nq,
+                name_id_format=name_id_format,
+                spnq=name_id_spnq,
+                return_to=return_to,
+            )
+        )
 
-    @expose("/sls", methods=["GET, POST"])
+    @expose("/sls", methods=["GET", "POST"])
     @event_logger.log_this
     @safe
     @statsd_metrics
@@ -193,8 +201,8 @@ class SAMLRestApi(BaseSupersetApi):
         paint_logout = False
 
         request_id = None
-        if 'LogoutRequestID' in session:
-            request_id = session['LogoutRequestID']
+        if "LogoutRequestID" in session:
+            request_id = session["LogoutRequestID"]
         dscb = lambda: session.clear()
         url = auth.process_slo(request_id=request_id, delete_session_cb=dscb)
         errors = auth.get_errors()
@@ -209,13 +217,13 @@ class SAMLRestApi(BaseSupersetApi):
             error_reason = auth.get_last_error_reason()
 
         return render_template(
-            'saml/index.html',
+            "saml/index.html",
             errors=errors,
             error_reason=error_reason,
             not_auth_warn=not_auth_warn,
             success_slo=success_slo,
             attributes=attributes,
-            paint_logout=paint_logout
+            paint_logout=paint_logout,
         )
 
     @expose("/metadata", methods=["GET"])
@@ -234,7 +242,7 @@ class SAMLRestApi(BaseSupersetApi):
 
         if len(errors) == 0:
             resp = make_response(metadata, 200)
-            resp.headers['Content-Type'] = 'text/xml'
+            resp.headers["Content-Type"] = "text/xml"
         else:
-            resp = make_response(', '.join(errors), 500)
+            resp = make_response(", ".join(errors), 500)
         return resp

@@ -28,9 +28,9 @@ from typing import Optional
 from cachelib.file import FileSystemCache
 from celery.schedules import crontab
 from flask_appbuilder.security.manager import AUTH_DB
-from superset.security import SupersetSecurityManager
 from flask_login import LoginManager
 
+from superset.security import SupersetSecurityManager
 
 logger = logging.getLogger()
 
@@ -132,9 +132,9 @@ CELERY_CONFIG = CeleryConfig
 
 FEATURE_FLAGS = {
     "ALERT_REPORTS": True,
-    'CLIENT_CACHE': True,
-    'ENABLE_EXPLORE_JSON_CSRF_PROTECTION': False,
-    'PRESTO_EXPAND_DATA': True,
+    "CLIENT_CACHE": True,
+    "ENABLE_EXPLORE_JSON_CSRF_PROTECTION": False,
+    "PRESTO_EXPAND_DATA": True,
 }
 ALERT_REPORTS_NOTIFICATION_DRY_RUN = True
 WEBDRIVER_BASEURL = "http://superset:8088/"
@@ -148,7 +148,7 @@ SQLLAB_TIMEOUT = int(timedelta(seconds=60).total_seconds())
 # Logging
 ENABLE_TIME_ROTATE = True
 
-SECRET_KEY = 'gIDkKronnUMX1GzPOkIPbWNMpkmIXpAJdIKLbdfPKhFUaXDBNetyVhEh'
+SECRET_KEY = "gIDkKronnUMX1GzPOkIPbWNMpkmIXpAJdIKLbdfPKhFUaXDBNetyVhEh"
 
 # Set the authentication type to OAuth
 AUTH_TYPE = AUTH_DB

@@ -66,6 +66,7 @@ RUN mkdir -p ${PYTHONPATH} \
             libpq-dev \
             libecpg-dev \
             libxmlsec1-dev \
+            pkg-config \
         && rm -rf /var/lib/apt/lists/*
 
 COPY ./requirements/*.txt  /app/requirements/
@@ -77,9 +78,9 @@ COPY superset-frontend/package.json /app/superset-frontend/
 RUN cd /app \
     && mkdir -p superset/static \
     && touch superset/static/version_info.json \
+    && pip install --upgrade pip \
     && pip install --no-cache -r requirements/local.txt
 
-RUN pip install --upgrade pip
 RUN pip install lunarcalendar tqdm "pystan<3.0" && pip install "prophet>=1.0.1, <1.1"
 
 COPY --from=superset-node /app/superset/static/assets /app/superset/static/assets
