@@ -63,7 +63,6 @@ class SAMLView(BaseSupersetView):
     @expose("/acs", methods=["GET", "POST"])
     @event_logger.log_this
     @safe
-    @statsd_metrics
     def assertion_consumer_service(self) -> Union[Response, str]:
         """
         [IDP -> SP]
@@ -139,7 +138,6 @@ class SAMLView(BaseSupersetView):
     @expose("/sso", methods=["GET", "POST"])
     @event_logger.log_this
     @safe
-    @statsd_metrics
     def single_sign_on(self):
         """
         [SP -> IDP] Single Sign-On Request API
@@ -152,7 +150,6 @@ class SAMLView(BaseSupersetView):
     @expose("/slo", methods=["GET", "POST"])
     @event_logger.log_this
     @safe
-    @statsd_metrics
     def single_logout(self):
         """
         [SP -> IDP] Single Logout Request API
@@ -187,7 +184,6 @@ class SAMLView(BaseSupersetView):
     @expose("/sls", methods=["GET", "POST"])
     @event_logger.log_this
     @safe
-    @statsd_metrics
     def single_logout_service(self):
         """
         [IDP -> SP] Single Logout Response 처리 API
@@ -231,7 +227,6 @@ class SAMLView(BaseSupersetView):
     @expose("/metadata", methods=["GET"])
     @event_logger.log_this
     @safe
-    @statsd_metrics
     def metadata(self):
         """
         [IDP -> SP] SP (Superset) 측 metadata 조회 API

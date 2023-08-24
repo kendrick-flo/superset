@@ -60,9 +60,9 @@
       </tbody>
     </table>
   {% endif %}
-  <a href="{{ url_for('single_logout') }}" class="btn btn-danger">Logout</a>
+  <a href="{{ url_for('SAMLView.single_logout') }}" class="btn btn-danger">Logout</a>
 {% else %}
-  <a href="{{ url_for('single_sign_on') }}" class="btn btn-primary">Login</a>
+  <a href="{{ url_for('SAMLView.single_sign_on') }}" class="btn btn-primary">Login</a>
 {% endif %}
 
 {% endblock %}
