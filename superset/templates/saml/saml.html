@@ -16,7 +16,7 @@
   specific language governing permissions and limitations
   under the License.
 #}
-{% extends "base.html" %}
+{% extends "saml/saml_base.html" %}
 
 {% block content %}
 
@@ -60,9 +60,9 @@
       </tbody>
     </table>
   {% endif %}
-  <a href="https://flo-reco-dashboard.dev.music-flo.io/saml/slo" class="btn btn-danger">Logout</a>
+  <a href="{{ url_for('single_logout') }}" class="btn btn-danger">Logout</a>
 {% else %}
-  <a href="https://flo-reco-dashboard.dev.music-flo.io/saml/sso" class="btn btn-primary">Login</a>
+  <a href="{{ url_for('single_sign_on') }}" class="btn btn-primary">Login</a>
 {% endif %}
 
 {% endblock %}

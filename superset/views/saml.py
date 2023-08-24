@@ -58,6 +58,7 @@ class SAMLView(BaseSupersetView):
 
     route_base = "/saml"
     allow_browser_login = True
+    default_view = "assertion_consumer_service"
 
     @expose("/acs", methods=["GET", "POST"])
     @event_logger.log_this
@@ -125,7 +126,7 @@ class SAMLView(BaseSupersetView):
                 error_reason = auth.get_last_error_reason()
 
         return self.render_template(
-            "saml/index.html",
+            "saml/saml.html",
             errors=errors,
             error_reason=error_reason,
             not_auth_warn=not_auth_warn,
@@ -217,7 +218,7 @@ class SAMLView(BaseSupersetView):
             error_reason = auth.get_last_error_reason()
 
         return self.render_template(
-            "saml/index.html",
+            "saml/saml.html",
             errors=errors,
             error_reason=error_reason,
             not_auth_warn=not_auth_warn,
