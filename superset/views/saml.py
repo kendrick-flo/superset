@@ -26,6 +26,7 @@ from onelogin.saml2.auth import OneLogin_Saml2_Auth
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
 from werkzeug import Response
 
+from .base import BaseSupersetView
 from superset import conf
 from superset.extensions import event_logger
 from superset.views.base_api import BaseSupersetApi, statsd_metrics
@@ -49,15 +50,14 @@ def prepare_flask_request(request):
     }
 
 
-class SAMLRestApi(BaseSupersetApi):
+class SAMLView(BaseSupersetView):
     """
-    Superset (SP) - Gsuite (IDP) SAML2.0 연동을 위한 Custom API
+    Superset (SP) - Gsuite (IDP) SAML2.0 연동을 위한 Custom View API
     Reference: https://github.com/SAML-Toolkits/python3-saml > demo-flask 예제 참고
     """
 
     route_base = "/saml"
     allow_browser_login = True
-    openapi_spec_tag = "SAML"
 
     @expose("/acs", methods=["GET", "POST"])
     @event_logger.log_this

@@ -157,7 +157,7 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         from superset.views.annotations import AnnotationLayerView
         from superset.views.api import Api
         from superset.views.chart.views import SliceAsync, SliceModelView
-        from superset.saml.api import SAMLRestApi
+        from superset.views.saml import SAMLView
         from superset.views.core import Superset
         from superset.views.css_templates import (
             CssTemplateAsyncModelView,
@@ -223,8 +223,6 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         appbuilder.add_api(ReportExecutionLogRestApi)
         appbuilder.add_api(SavedQueryRestApi)
         appbuilder.add_api(SqlLabRestApi)
-        # custom api for SAML
-        appbuilder.add_api(SAMLRestApi)
         #
         # Setup regular views
         #
@@ -417,6 +415,17 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
             category_label=__("Security"),
             icon="fa-table",
             menu_cond=lambda: bool(self.config["ENABLE_ACCESS_REQUEST"]),
+        )
+
+        # custom view for SAML
+        appbuilder.add_view(
+            SAMLView,
+            "SAML",
+            label=__("SAML"),
+            icon="fa-google",
+            category_icon="fa-google",
+            category="SAML",
+            category_label=__("SAML"),
         )
 
     def init_app_in_ctx(self) -> None:
