@@ -111,7 +111,8 @@ class SAMLView(BaseSupersetView):
                         last_name=session["samlNameId"],
                         email=session["samlNameId"],
                         password=password,
-                        role=self.appbuilder.sm.find_role("Gamma"),
+                        # Custom Role for only dashboard view
+                        role=self.appbuilder.sm.find_role("Viewer"),
                     )
                 login_user(user, remember=True)
                 # FIXME: request.form["RelayState"] <- 공백 값이 옴
