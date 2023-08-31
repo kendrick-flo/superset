@@ -17,19 +17,20 @@
 
 import uuid
 from typing import Union
+import datetime
 
 from flask import request, session, make_response, redirect, g
 from flask_appbuilder import expose
 from flask_appbuilder.api import safe
 from flask_login import login_user
 from onelogin.saml2.auth import OneLogin_Saml2_Auth
-from onelogin.saml2.utils import OneLogin_Saml2_Utils
 from werkzeug import Response
 
 from .base import BaseSupersetView
 from superset import conf
 from superset.extensions import event_logger
-from superset.views.base_api import BaseSupersetApi, statsd_metrics
+
+REMEMBER_COOKIE_DURATION = datetime.timedelta(days=1)
 
 
 def init_saml_auth(req):
@@ -114,7 +115,7 @@ class SAMLView(BaseSupersetView):
                         # Custom Role for only dashboard view
                         role=self.appbuilder.sm.find_role("Viewer"),
                     )
-                login_user(user, remember=True)
+                login_user(user, remember=True, duration=REMEMBER_COOKIE_DURATION)
                 # FIXME: request.form["RelayState"] <- 공백 값이 옴
                 #  return_to 로 redirection url 을 강제 주입한다
                 return_to = f"{request.host_url}superset/welcome/"
