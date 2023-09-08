@@ -141,7 +141,7 @@ class CeleryConfig(object):
         },
         "cache-warmup": {
             "task": "cache-warmup",
-            "schedule": crontab(minute="0", hour="6"),
+            "schedule": crontab(minute="*/5", hour="*"),
             "kwargs": {"strategy_name": "dummy"},
         },
     }
