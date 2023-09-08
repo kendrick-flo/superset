@@ -91,6 +91,7 @@ class MachineAuthProvider:
                 cookie = parse_cookie(value)
                 cookie_tuple = list(cookie.items())[0]
                 cookies[cookie_tuple[0]] = cookie_tuple[1]
+                logger.warning(f"@@@@@ name: {name} / value: {value} / cookies: {cookies}")
 
         return cookies
 

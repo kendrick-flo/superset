@@ -235,7 +235,7 @@ def fetch_url(url: str, headers: Dict[str, str]) -> Dict[str, str]:
             logger.error("Error fetching %s, status code: %s", url, response.code)
     except URLError as err:
         logger.exception("Error warming up cache!")
-        result = {"error": url, "exception": str(err)}
+        result = {"error": url, "exception": str(err), "headers": headers}
     return result
 
 
@@ -268,7 +268,7 @@ def cache_warmup(
         logger.exception(message)
         return message
 
-    user = security_manager.get_user_by_username(app.config["THUMBNAIL_SELENIUM_USER"])
+    user = security_manager.get_user_by_username(username="admin")
     cookies = MachineAuthProvider.get_auth_cookies(user)
     headers = {"Cookie": f"session={cookies.get('session', '')}"}
 

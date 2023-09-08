@@ -121,7 +121,7 @@ EXPLORE_FORM_DATA_CACHE_CONFIG = {
 # Authentication For Cache Warm-Up
 # https://github.com/apache/superset/pull/21076
 # superset/tasks/cache.py 코드 확인!
-THUMBNAIL_SELENIUM_USER = "Admin"
+THUMBNAIL_SELENIUM_USER = "admin"
 
 
 class CeleryConfig(object):
@@ -142,7 +142,11 @@ class CeleryConfig(object):
         "cache-warmup": {
             "task": "cache-warmup",
             "schedule": crontab(minute="*", hour="*"),
-            "kwargs": {"strategy_name": "dummy"},
+            # "kwargs": {"strategy_name": "dummy"},
+            'kwargs': {
+                'strategy_name': 'top_n_dashboards',
+                'top_n': 1,
+            },
         },
     }
 
