@@ -1684,7 +1684,7 @@ class Superset(BaseSupersetView):  # pylint: disable=too-many-public-methods
 
     @event_logger.log_this
     @api
-    @has_access_api
+    # @has_access_api
     @expose("/warm_up_cache/", methods=["GET"])
     def warm_up_cache(  # pylint: disable=too-many-locals,no-self-use
         self,
