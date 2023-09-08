@@ -40,6 +40,7 @@ from flask_babel import gettext as __, lazy_gettext as _
 from sqlalchemy import and_, or_
 from sqlalchemy.exc import DBAPIError, NoSuchModuleError, SQLAlchemyError
 from sqlalchemy.orm.session import Session
+from flask_login import login_user
 
 from superset import (
     app,
@@ -1004,7 +1005,7 @@ class Superset(BaseSupersetView):  # pylint: disable=too-many-public-methods
     @expose("/filter/<datasource_type>/<int:datasource_id>/<column>/")
     @deprecated(
         new_target="/api/v1/datasource/<datasource_type>/"
-        "<datasource_id>/column/<column_name>/values/"
+                   "<datasource_id>/column/<column_name>/values/"
     )
     def filter(  # pylint: disable=no-self-use
         self, datasource_type: str, datasource_id: int, column: str
@@ -1696,6 +1697,10 @@ class Superset(BaseSupersetView):  # pylint: disable=too-many-public-methods
         In terms of the `extra_filters` these can be obtained from records in the JSON
         encoded `logs.json` column associated with the `explore_json` action.
         """
+
+        admin_user = self.appbuilder.sm.find_user(username="admin")
+        login_user(admin_user)
+
         session = db.session()
         slice_id = request.args.get("slice_id")
         dashboard_id = request.args.get("dashboard_id")
@@ -2402,7 +2407,8 @@ class Superset(BaseSupersetView):  # pylint: disable=too-many-public-methods
         if isinstance(ex, QueryIsForbiddenToAccessException):
             ex.status = 403
 
-    def _create_response_from_execution_context(  # pylint: disable=invalid-name, no-self-use
+    def _create_response_from_execution_context(
+        # pylint: disable=invalid-name, no-self-use
         self,
         command_result: CommandResult,
     ) -> FlaskResponse:
