@@ -1685,7 +1685,7 @@ class Superset(BaseSupersetView):  # pylint: disable=too-many-public-methods
 
     @event_logger.log_this
     @api
-    # @has_access_api
+    @has_access_api
     @expose("/warm_up_cache/", methods=["GET"])
     def warm_up_cache(  # pylint: disable=too-many-locals,no-self-use
         self,
@@ -1697,10 +1697,6 @@ class Superset(BaseSupersetView):  # pylint: disable=too-many-public-methods
         In terms of the `extra_filters` these can be obtained from records in the JSON
         encoded `logs.json` column associated with the `explore_json` action.
         """
-
-        admin_user = self.appbuilder.sm.find_user(username="admin")
-        login_user(admin_user)
-
         session = db.session()
         slice_id = request.args.get("slice_id")
         dashboard_id = request.args.get("dashboard_id")

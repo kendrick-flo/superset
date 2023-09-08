@@ -268,7 +268,7 @@ def cache_warmup(
         logger.exception(message)
         return message
 
-    user = security_manager.get_user_by_username(username="admin")
+    user = security_manager.get_user_by_username(app.config["THUMBNAIL_SELENIUM_USER"])
     cookies = MachineAuthProvider.get_auth_cookies(user)
     headers = {"Cookie": f"session={cookies.get('session', '')}"}
 
