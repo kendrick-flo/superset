@@ -121,7 +121,7 @@ EXPLORE_FORM_DATA_CACHE_CONFIG = {
 # Authentication For Cache Warm-Up
 # https://github.com/apache/superset/pull/21076
 # superset/tasks/cache.py 코드 확인!
-THUMBNAIL_SELENIUM_USER = "admin"
+THUMBNAIL_SELENIUM_USER = "Admin"
 
 
 class CeleryConfig(object):
@@ -141,7 +141,7 @@ class CeleryConfig(object):
         },
         "cache-warmup": {
             "task": "cache-warmup",
-            "schedule": crontab(minute="*/5", hour="*"),
+            "schedule": crontab(minute="*", hour="*"),
             "kwargs": {"strategy_name": "dummy"},
         },
     }
@@ -183,6 +183,7 @@ LOGOUT_REDIRECT_URL = "https://flo-reco-dashboard.dev.music-flo.io/saml/acs"
 WTF_CSRF_EXEMPT_LIST = [
     "superset.views.core.log",
     "superset.views.core.explore_json",
+    "superset.views.core.warm_up_cache",
     "superset.charts.data.api.data",
     "superset.views.saml.assertion_consumer_service",
     "superset.views.saml.single_sign_on",

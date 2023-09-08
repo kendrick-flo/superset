@@ -18,8 +18,8 @@
 ######################################################################
 # Node stage to deal with static asset construction
 ######################################################################
-#ARG PY_VER=3.8.16-slim
-ARG PY_VER=3.9-slim-bookworm
+ARG PY_VER=3.8.16-slim
+#ARG PY_VER=3.9-slim-bookworm
 FROM node:16-slim AS superset-node
 
 ARG NPM_BUILD_CMD="build"
@@ -93,8 +93,9 @@ RUN cd /app \
         && flask fab babel-compile --target superset/translations
 
 RUN pip install lunarcalendar tqdm  \
-    && pip install --no-cache-dir "Cython==0.29.24" \
-    && pip install --no-cache-dir "pystan==2.19.1.1"  \
+#    && pip install --no-cache-dir "Cython==0.29.24" \
+#    && pip install --no-cache-dir "pystan==2.19.1.1"  \
+    && pip install --no-cache-dir "pystan<3.0"  \
     && pip install --no-cache-dir "prophet>=1.0.1, <1.1"
 
 COPY ./docker/run-server.sh /usr/bin/
