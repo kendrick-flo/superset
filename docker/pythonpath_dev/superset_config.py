@@ -29,6 +29,7 @@ from cachelib.file import FileSystemCache
 from celery.schedules import crontab
 from flask_appbuilder.security.manager import AUTH_DB
 from flask_login import LoginManager
+from flask_caching.backends.rediscache import RedisCache
 
 from superset.security import SupersetSecurityManager
 
@@ -70,11 +71,20 @@ REDIS_HOST = get_env_variable("REDIS_HOST")
 REDIS_PORT = get_env_variable("REDIS_PORT")
 REDIS_CELERY_DB = get_env_variable("REDIS_CELERY_DB", "0")
 REDIS_RESULTS_DB = get_env_variable("REDIS_RESULTS_DB", "1")
-REDIS_DATA_CACHE_DB = get_env_variable("REDIS_RESULTS_DB", "2")
-REDIS_FILTER_STATE_CACHE_DB = get_env_variable("REDIS_RESULTS_DB", "3")
-REDIS_EXPLORE_FORM_DATA_CACHE_DB = get_env_variable("REDIS_RESULTS_DB", "4")
+REDIS_DATA_CACHE_DB = get_env_variable("REDIS_DATA_CACHE_DB", "2")
+REDIS_FILTER_STATE_CACHE_DB = get_env_variable("REDIS_FILTER_STATE_DB", "3")
+REDIS_EXPLORE_FORM_DATA_CACHE_DB = get_env_variable("REDIS_EXPLORE_FORM_DATA_DB", "4")
+REDIS_QUERY_RESULTS_CACHE_DB = 5
 
-RESULTS_BACKEND = FileSystemCache("/app/superset_home/sqllab")
+# Results Backend for sqllab query
+# RESULTS_BACKEND = FileSystemCache("/app/superset_home/sqllab")
+RESULTS_BACKEND = RedisCache(
+    default_timeout=86400,
+    key_prefix="superset_sqllab_query_results",
+    host=REDIS_HOST,
+    port=REDIS_PORT,
+    db=REDIS_QUERY_RESULTS_CACHE_DB,
+)
 
 CACHE_CONFIG = {
     "CACHE_TYPE": "RedisCache",
@@ -108,6 +118,10 @@ EXPLORE_FORM_DATA_CACHE_CONFIG = {
     "CACHE_REDIS_PORT": REDIS_PORT,
     "CACHE_REDIS_DB": REDIS_EXPLORE_FORM_DATA_CACHE_DB,
 }
+# Authentication For Cache Warm-Up
+# https://github.com/apache/superset/pull/21076
+# superset/tasks/cache.py 코드 확인!
+THUMBNAIL_SELENIUM_USER = "admin"
 
 
 class CeleryConfig(object):
@@ -124,6 +138,11 @@ class CeleryConfig(object):
         "reports.prune_log": {
             "task": "reports.prune_log",
             "schedule": crontab(minute=10, hour=0),
+        },
+        "cache-warmup": {
+            "task": "cache-warmup",
+            "schedule": crontab(minute="0", hour="6"),
+            "kwargs": {"strategy_name": "dummy"},
         },
     }
 
@@ -165,12 +184,11 @@ WTF_CSRF_EXEMPT_LIST = [
     "superset.views.core.log",
     "superset.views.core.explore_json",
     "superset.charts.data.api.data",
-
     "superset.views.saml.assertion_consumer_service",
     "superset.views.saml.single_sign_on",
     "superset.views.saml.single_logout",
     "superset.views.saml.single_logout_service",
-    "superset.views.saml.metadata"
+    "superset.views.saml.metadata",
 ]
 ENABLE_PROXY_FIX = True
 
