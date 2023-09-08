@@ -25,7 +25,6 @@ from flask import current_app, Flask, request, Response, session
 from flask_login import login_user
 from selenium.webdriver.remote.webdriver import WebDriver
 from werkzeug.http import parse_cookie
-from flask.sessions import SessionMixin
 
 from superset.utils.urls import headless_url
 
@@ -92,32 +91,7 @@ class MachineAuthProvider:
                 cookie = parse_cookie(value)
                 cookie_tuple = list(cookie.items())[0]
                 cookies[cookie_tuple[0]] = cookie_tuple[1]
-
-        return cookies
-
-    @staticmethod
-    def get_admin_auth_cookies(user: User, session_mix_in: SessionMixin) -> Dict[str, str]:
-        # Login with the user specified to get the reports
-        with current_app.test_request_context("/login"):
-            login_user(user)
-            # A mock response object to get the cookie information from
-            response = Response()
-            current_app.session_interface.save_session(current_app, session_mix_in, response)
-
-        cookies = {}
-
-        # Grab any "set-cookie" headers from the login response
-        for name, value in response.headers:
-            if name.lower() == "set-cookie":
-                # This yields a MultiDict, which is ordered -- something like
-                # MultiDict([('session', 'value-we-want), ('HttpOnly', ''), etc...
-                # Therefore, we just need to grab the first tuple and add it to our
-                # final dict
-                cookie = parse_cookie(value)
-                cookie_tuple = list(cookie.items())[0]
-                cookies[cookie_tuple[0]] = cookie_tuple[1]
-                logger.warning(
-                    f"@@@@@ name: {name} / value: {value} / cookies: {cookies}")
+                logger.warning(f"@@@@@ name: {name} / value: {value} / cookies: {cookies}")
 
         return cookies
 

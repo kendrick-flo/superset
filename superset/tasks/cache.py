@@ -22,7 +22,6 @@ from urllib.error import URLError
 from celery.beat import SchedulingError
 from celery.utils.log import get_task_logger
 from sqlalchemy import and_, func
-from flask.sessions import SecureCookieSession
 
 from superset import app, db, security_manager
 from superset.extensions import celery_app
@@ -269,10 +268,8 @@ def cache_warmup(
         logger.exception(message)
         return message
 
-    user = security_manager.find_user(username="admin")
-    cookies = MachineAuthProvider.get_admin_auth_cookies(
-        user=user,
-        session_mix_in=SecureCookieSession())
+    user = security_manager.get_user_by_username(username="admin")
+    cookies = MachineAuthProvider.get_auth_cookies(user)
     headers = {"Cookie": f"session={cookies.get('session', '')}"}
 
     results: Dict[str, List[str]] = {"scheduled": [], "errors": []}
@@ -280,7 +277,6 @@ def cache_warmup(
         try:
             logger.info("Scheduling %s", url)
             fetch_url.delay(url, headers)
-            logger.info(f"@@@@@ user: {user}")
             results["scheduled"].append(url)
         except SchedulingError:
             logger.exception("Error scheduling fetch_url: %s", url)

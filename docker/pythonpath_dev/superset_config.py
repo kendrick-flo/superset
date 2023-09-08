@@ -172,7 +172,6 @@ SQLLAB_TIMEOUT = int(timedelta(seconds=60).total_seconds())
 ENABLE_TIME_ROTATE = True
 
 SECRET_KEY = "gIDkKronnUMX1GzPOkIPbWNMpkmIXpAJdIKLbdfPKhFUaXDBNetyVhEh"
-PERMANENT_SESSION_LIFETIME = timedelta(hours=24)
 
 # Set the authentication type to OAuth
 AUTH_TYPE = AUTH_DB
