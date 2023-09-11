@@ -125,6 +125,8 @@ THUMBNAIL_SELENIUM_USER = "admin"
 
 
 class CeleryConfig(object):
+    timezone = 'Asia/Seoul'
+    enable_utc = False
     broker_url = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_CELERY_DB}"
     imports = ("superset.sql_lab",)
     result_backend = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_RESULTS_DB}"
